@@ -42,7 +42,9 @@ function Form() {
   };
 
   const handleChange = (value, property) => {
-    setFormData({ ...formData, [property]: value });
+    setFormData((prevState) => {
+      return { ...prevState, [property]: value };
+    });
   };
 
 
