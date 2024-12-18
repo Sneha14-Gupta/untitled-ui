@@ -1,6 +1,7 @@
+import { useForm } from "react-hook-form";
 import { TbFlareFilled } from "react-icons/tb";
 import Intro from "@/components/Intro";
-import { useState } from "react";
+import utils from "@/lib/utils";
 
 const services = [
   "Website Design",
@@ -12,81 +13,56 @@ const services = [
 ];
 
 function Form() {
-
-  const [formData, setFormData] = useState({
-    fullname: "",
-    email: "",
-    message: "",
-  });
-
-  const [selectedServices, setSelectedServices] = useState([]);
-
-  const handleCheckbox = (value, checked) => {
-    // if (checked) {
-    //   setSelectedServices((prevState) => [...prevState, value]);
-    // } else {
-    //   setSelectedServices((prevState) => {
-    //     return prevState.filter((item) => item !== value);
-    //   });
-    // }
-    setSelectedServices((prevState) => {
-      return checked ? [...prevState, value] : prevState.filter((item) => item !== value);
-    });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log({
-      ...formData,
-      services: selectedServices,
-    });
-
-  };
-
-  const handleChange = (value, property) => {
-    setFormData((prevState) => {
-      return { ...prevState, [property]: value };
-    });
-  };
-
-
+  const { register, handleSubmit, formState: { errors } } = useForm();
 
   return (
 
     <>
       <Intro />
-      <form className="flex flex-col gap-1" action={import.meta.env.VITE_SUBMIT_URL}>
+      <form className="flex flex-col gap-1" onSubmit={handleSubmit((data) => {
+        console.log(data)
+      })}
+      >
         {/* Input */}
         <input
           type="text"
-          name={import.meta.env.VITE_NAME_FIELD}
+          {...register("fullname", {
+            required: "Please enter your name",
+
+          })}
           id="fullname"
           placeholder="Your name"
           className="border-b border-stone-700 bg-zinc-50 p-2 placeholder-slate-700 md:bg-lime-400"
-          required
-          value={formData.fullname}
-          onChange={(e) => handleChange(e.target.value, "fullname")}
+
         />
+        {errors.fullname && <p className="text-red-500">{errors.fullname.message}</p>}
         <input
-          type="email"
-          name={import.meta.env.VITE_EMAIL_FIELD}
+          type="text"
+          {...register("email", {
+            required: "Please enter your email",
+            pattern: {
+              value: /[\w]*@*[a-z]*\.*[\w]{5,}(\.)*(com)*(@gmail\.com)/g,
+              message: "Please enter a valid email address",
+            },
+          })}
           id="email"
           placeholder="your@company.com"
           className="border-b border-stone-700 bg-zinc-50 p-2 placeholder-slate-700 md:bg-lime-400"
-          required
-          value={formData.email}
-          onChange={(e) => handleChange(e.target.value, "email")}
+
         />
+        {errors.email && <p className="text-red-500">{errors.email.message}</p>}
         <input
           type="text"
-          name={import.meta.env.VITE_MESSAGE_FIELD}
+          {...register("message", {
+            required: "Please enter a message",
+          })}
           id="message"
           placeholder="Tell us a bit about your project..."
           className="h-24 border-b border-stone-700 bg-zinc-50 p-2 placeholder-slate-700 md:bg-lime-400"
-          required
-          value={formData.message}
-          onChange={(e) => handleChange(e.target.value, "message")}
+
+
         />
+        {errors.message && <p className="text-red-500">{errors.message.message}</p>}
 
         <p className="my-5 text-zinc-800">How can we help?</p>
 
@@ -100,15 +76,18 @@ function Form() {
               >
                 <input
                   type="checkbox"
-                  name={import.meta.env.VITE_SERVICES_FIELD}
+                  {...register("service", {
+                    required: "Please select atleast one service",
+                  }
+                  )}
                   value={service}
-                  className="size-6"
-                  onChange={(e) => handleCheckbox(service, e.target.checked)}
+
                 />
                 {service}
               </label>
             );
           })}
+          {errors.service && <p className="text-red-500">{errors.service.message}</p>}
         </section>
         <button
           type="submit"
