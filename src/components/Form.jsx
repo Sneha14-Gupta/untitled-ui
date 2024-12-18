@@ -15,13 +15,27 @@ const services = [
 function Form() {
   const { register, handleSubmit, formState: { errors } } = useForm();
 
+  const handleFormSubmit = (data) => {
+    const formData = new FormData();
+    formData.append(utils.fullname, data.fullname);
+    formData.append(utils.email, data.email);
+    formData.append(utils.message, data.message);
+    formData.append(utils.service, data.service);
+    console.log(formData);
+    fetch(utils.submiturl, {
+      method: "POST",
+      mode: "no-cors",
+      body: formData,
+    })
+      .then(() => {
+        console.log("Form submitted successfully", utils.entriesurl);
+      })
+  }
   return (
 
     <>
       <Intro />
-      <form className="flex flex-col gap-1" onSubmit={handleSubmit((data) => {
-        console.log(data)
-      })}
+      <form className="flex flex-col gap-1" onSubmit={handleSubmit(handleFormSubmit)}
       >
         {/* Input */}
         <input
