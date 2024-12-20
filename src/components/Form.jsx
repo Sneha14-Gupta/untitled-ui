@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { TbFlareFilled } from "react-icons/tb";
 import Intro from "@/components/Intro";
@@ -13,9 +14,23 @@ const services = [
 ];
 
 function Form() {
+  const navigate = useNavigate();
   const { register, handleSubmit, formState: { errors } } = useForm();
 
-  const handleFormSubmit = (data) => {
+  const handleFormSubmit = async (data) => {
+    const res = await fetch('https://vector.profanity.dev', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: data.message }),
+    })
+    const resData = await res.json()
+    if (resData.isProfanity) {
+      return navigate("/error", {
+        state: {
+          badWord: resData.flaggedFor
+        }
+      })
+    }
     const formData = new FormData();
     formData.append(utils.fullname, data.fullname);
     formData.append(utils.email, data.email);
@@ -28,7 +43,12 @@ function Form() {
       body: formData,
     })
       .then(() => {
-        console.log("Form submitted successfully", utils.entriesurl);
+        navigate("/submission", {
+          state: {
+            name: data.fullname,
+          }
+        })
+
       })
   }
   return (
